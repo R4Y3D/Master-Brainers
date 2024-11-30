@@ -9,32 +9,37 @@ import SwiftUI
 
 struct TriviaView: View {
     @EnvironmentObject var triviaManager: TriviaManager
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
-        if triviaManager.reachedEnd {
-            VStack(spacing: 20) {
-                Text("Trivia Game")
-                    .accentTitle()
+        VStack {
+            if triviaManager.reachedEnd {
+                VStack(spacing: 20) {
+                    Text("Trivia Game")
+                        .accentTitle()
 
-                Text("Congratulations, you completed the game! 🥳")
-                
-                Text("You scored \(triviaManager.score) out of \(triviaManager.length)")
-                
-                Button {
-                    Task.init {
-                        await triviaManager.fetchTrivia()
+                    Text("Congratulations, you completed the game! 🥳")
+                        .multilineTextAlignment(.center)
+                        .font(.title2)
+                    
+                    Text("You scored \(triviaManager.score) out of \(triviaManager.length)")
+                        .font(.headline)
+                        .foregroundColor(Color("AccentColor"))
+
+                    Button {
+                        presentationMode.wrappedValue.dismiss()
+                    } label: {
+                        PrimaryButton(text: "Back to Main Menu")
                     }
-                } label: {
-                    PrimaryButton(text: "Play again")
                 }
+                .foregroundColor(Color("AccentColor"))
+                .padding()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color(red: 0.984, green: 0.929, blue: 0.847))
+            } else {
+                QuestionView()
+                    .environmentObject(triviaManager)
             }
-            .foregroundColor(Color("AccentColor"))
-            .padding()
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(red: 0.984313725490196, green: 0.9294117647058824, blue: 0.8470588235294118))
-        } else {
-            QuestionView()
-                .environmentObject(triviaManager)
         }
     }
 }

@@ -9,46 +9,66 @@ import SwiftUI
 
 struct QuestionView: View {
     @EnvironmentObject var triviaManager: TriviaManager
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         VStack(spacing: 40) {
             HStack {
+                // Back Button
+                Button {
+                    presentationMode.wrappedValue.dismiss()
+                } label: {
+                    Image(systemName: "arrow.backward")
+                        .foregroundColor(Color("AccentColor"))
+                        .font(.title)
+                }
+                
+                // Title
                 Text("Trivia Game")
-                    .accentTitle()
+                    .font(.headline)
+                    .foregroundColor(Color("AccentColor"))
                 
                 Spacer()
                 
-                Text("\(triviaManager.index + 1) out of \(triviaManager.length)")
+                // Question Number
+                Text("\(triviaManager.index + 1) of \(triviaManager.length)")
                     .foregroundColor(Color("AccentColor"))
                     .fontWeight(.heavy)
             }
             
             ProgressBar(progress: triviaManager.progress)
-            
+                .frame(height: 10)
+                .padding(.vertical)
+
             VStack(alignment: .leading, spacing: 20) {
                 Text(triviaManager.question)
-                    .font(.system(size: 20))
+                    .font(.system(size: 22))
                     .bold()
-                    .foregroundColor(.gray)
-                
+                    .foregroundColor(.black)
+                    .lineLimit(nil)
+
                 ForEach(triviaManager.answerChoices, id: \.id) { answer in
                     AnswerRow(answer: answer)
                         .environmentObject(triviaManager)
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            
+            Spacer()
             
             Button {
                 triviaManager.goToNextQuestion()
             } label: {
-                PrimaryButton(text: "Next", background: triviaManager.answerSelected ? Color("AccentColor") : Color(hue: 1.0, saturation: 0.0, brightness: 0.564, opacity: 0.327))
+                PrimaryButton(
+                    text: "Next",
+                    background: triviaManager.answerSelected ? Color("AccentColor") : Color.gray.opacity(0.5)
+                )
             }
             .disabled(!triviaManager.answerSelected)
-            
-            Spacer()
         }
         .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .background(Color(red: 0.984313725490196, green: 0.9294117647058824, blue: 0.8470588235294118))
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .background(Color(red: 0.984, green: 0.929, blue: 0.847))
         .navigationBarHidden(true)
     }
 }
