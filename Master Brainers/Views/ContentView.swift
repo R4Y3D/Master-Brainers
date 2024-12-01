@@ -18,7 +18,11 @@ struct ContentView: View {
         (id: 9, name: "General Knowledge"),
         (id: 17, name: "Science & Nature"),
         (id: 18, name: "Computers"),
-        (id: 23, name: "History")
+        (id: 23, name: "History"),
+        (id: 26, name: "Celebrities"),
+        (id: 20, name: "Mythology"),
+        (id: 19, name: "Mathematics"),
+        (id: 12, name: "Music")
     ]
     
     var body: some View {
@@ -80,7 +84,15 @@ struct ContentView: View {
                             .frame(width: 150, height: 150)
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                                 Spacer()
-                
+                let categoryColors: [Int: Color] = [
+                                    9: Color.green,
+                                    17: Color.red,
+                                    18: Color.purple,
+                                    23: Color.orange,
+                                    26: Color.pink,
+                                    20: Color.yellow
+                                ]
+
                 // 2x2 Grid for Categories
                 LazyVGrid(
                     columns: [GridItem(.flexible()), GridItem(.flexible())],
@@ -100,7 +112,10 @@ struct ContentView: View {
                                     }
                                 }
                         } label: {
-                            PrimaryButton(text: category.name)
+                            PrimaryButton(text: category.name,
+                                          background:categoryColors[category.id] ?? Color.blue
+
+                            )
                         }
                     }
                 }
