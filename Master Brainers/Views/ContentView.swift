@@ -11,6 +11,7 @@ struct ContentView: View {
     @StateObject var triviaManager = TriviaManager()
     @State private var selectedDifficulty: String? = nil
     @State private var numberOfQuestions: Int = 10 // Default number of questions
+    @State private var Brain:String = "Brain"
     
     let difficulties = ["Easy", "Medium", "Hard"]
     let categories = [
@@ -22,36 +23,40 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 40) {
-                VStack(spacing: 20) {
+            VStack(spacing: 20) {
+                // Title Section
+                VStack(spacing: 10) {
                     Text("Master Brainers")
-                        .accentTitle()
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(Color("AccentColor"))
                     
                     Text("Choose your settings!")
+                        .font(.title2)
                         .foregroundColor(Color("AccentColor"))
                 }
                 
-                HStack(spacing: 20) {
-                    // Difficulty Picker
-                    Picker("Difficulty", selection: $selectedDifficulty) {
-                        Text("Any Difficulty").tag(String?.none)
-                        ForEach(difficulties, id: \.self) { difficulty in
-                            Text(difficulty).tag(String?.some(difficulty.lowercased()))
+                // Difficulty Picker and Stepper Section
+                VStack(spacing: 20) {
+                    HStack(spacing: 20) {
+                        // Difficulty Picker
+                        Picker("Difficulty", selection: $selectedDifficulty) {
+                            Text("Any Difficulty").tag(String?.none)
+                            ForEach(difficulties, id: \.self) { difficulty in
+                                Text(difficulty).tag(String?.some(difficulty.lowercased()))
+                            }
                         }
-                    }
-                    .pickerStyle(MenuPickerStyle())
-                    .padding(.horizontal)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(radius: 2)
-                    
-                    // Number of Questions Stepper
-                    HStack(spacing: 10) {
+                        .pickerStyle(MenuPickerStyle())
+                        .padding(.horizontal)
+                        .background(Color.white)
+                        .cornerRadius(10)
+                        .shadow(radius: 2)
                         
-                        HStack(spacing: 5) {
+                        // Number of Questions Stepper
+                        HStack(spacing: 10) {
                             Stepper("", value: $numberOfQuestions, in: 1...50)
                                 .labelsHidden()
-                                .frame(width: 100) // Set a compact width for the Stepper
+                                .frame(width: 100) // Compact width for the Stepper
                             
                             Text("\(numberOfQuestions)")
                                 .frame(width: 35) // Allow space for double-digit numbers
@@ -62,28 +67,48 @@ struct ContentView: View {
                     }
                 }
                 .padding(.horizontal)
+                .background(Color(red: 0.98, green: 0.98, blue: 0.98))
+                .cornerRadius(10)
+                .shadow(radius: 2)
                 
-                // Category Buttons
-                ForEach(categories, id: \.id) { category in
-                    NavigationLink {
-                        TriviaView()
-                            .environmentObject(triviaManager)
-                            .onAppear {
-                                Task {
-                                    await triviaManager.fetchTrivia(
-                                        category: category.id,
-                                        difficulty: selectedDifficulty,
-                                        amount: numberOfQuestions
-                                    )
+                
+                Spacer()
+                //Image Holder
+                Image(Brain)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 150, height: 150)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
+                                Spacer()
+                
+                // 2x2 Grid for Categories
+                LazyVGrid(
+                    columns: [GridItem(.flexible()), GridItem(.flexible())],
+                    spacing: 20
+                ) {
+                    ForEach(categories, id: \.id) { category in
+                        NavigationLink {
+                            TriviaView()
+                                .environmentObject(triviaManager)
+                                .onAppear {
+                                    Task {
+                                        await triviaManager.fetchTrivia(
+                                            category: category.id,
+                                            difficulty: selectedDifficulty,
+                                            amount: numberOfQuestions
+                                        )
+                                    }
                                 }
-                            }
-                    } label: {
-                        PrimaryButton(text: category.name)
+                        } label: {
+                            PrimaryButton(text: category.name)
+                        }
                     }
                 }
+                .padding(.horizontal)
+                
+                Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .edgesIgnoringSafeArea(.all)
             .background(Color(red: 0.984, green: 0.929, blue: 0.847))
         }
     }
